@@ -72,16 +72,10 @@ getNextBus = (event, context) => {
         request.get(endpoint, (response) => {
             response.on('data', (chunk) => { body += chunk });
             response.on('end', () => {
-                var data = JSON.parse(body);
-                //console.log("bus time = "+data[0].timeToStation);
-                var timeToStation = data[0].timeToStation;
-                var lineName = data[0].lineName;
-                var direction = data[0].towards;
-                var time = parseInt(timeToStation);
-                var minutes = Math.floor(time / 60);
-                var seconds = time - minutes * 60;
 
-                var message = lineName + " towards " + direction + " expected in " + minutes + " minutes and " + seconds + " seconds";
+                var buses = parseResponse(body);
+
+                var message = buses[0].lineName + " towards " + buses[0].direction + " expected in " + buses[0].minutes + " minutes and " + buses[0].seconds + " seconds";
                 context.succeed(
                     generateResponse(
                         buildSpeechletResponse(message, true), {}));
@@ -95,6 +89,26 @@ getNextBus = (event, context) => {
                 buildSpeechletResponse("sorry I did not reconize the destination", true), {}));
     
     }          
+};
+
+
+parseResponse = (body) => {
+  var buses = [];
+  var data = JSON.parse(body);
+  console.log(body);
+  for(var i=0; i<data.length; i++)
+  {
+    var bus = {};
+    console.log("bus time = "+data[i].timeToStation);
+    bus["timeToStation"] = data[i].timeToStation;
+    bus["lineName"] = data[i].lineName;
+    bus["direction"] = data[i].towards;
+    var time = parseInt(data[i].timeToStation);
+    bus["minutes"] = Math.floor(time / 60);
+    bus["seconds"] = time - bus["minutes"] * 60;
+    buses.push(bus);
+  }
+  return buses;
 };
 
 
