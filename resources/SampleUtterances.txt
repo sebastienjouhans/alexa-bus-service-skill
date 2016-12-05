@@ -1,0 +1,22 @@
+NextBusIntent when is the next bus to {BusDirection}
+NextBusIntent when is the next bus towards {BusDirection}
+NextBusIntent tell me when is the next bus to {BusDirection}
+NextBusIntent tell me when is the next bus towards {BusDirection}
+NextBusIntent when is my next bus to {BusDirection}
+NextBusIntent when is my next bus towards {BusDirection}
+NextBusIntent my next bus to {BusDirection}
+NextBusIntent my next bus towards {BusDirection}
+NextBusIntent buses to {BusDirection}
+NextBusIntent buses towards {BusDirection}
+NextBusIntent bus to {BusDirection}
+NextBusIntent bus towards {BusDirection}
+NextBusIntent to {BusDirection}
+NextBusIntent towards {BusDirection}
+NextBusIntent for my next bus to {BusDirection}
+NextBusIntent for my next bus towards {BusDirection}
+NextBusIntent for the next bus to {BusDirection}
+NextBusIntent for the next bus towards {BusDirection}
+NextBusIntent for next buses to {BusDirection}
+NextBusIntent for next buses towards {BusDirection}
+NextBusIntent for the next buses to {BusDirection}
+NextBusIntent for the next buses towards {BusDirection}

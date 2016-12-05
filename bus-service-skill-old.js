@@ -24,7 +24,7 @@ exports.handler = (event, context) => {
 
         switch(event.request.intent.name) {
         
-          case "GetNextBusIntent":
+          case "NextBusIntent":
          
             getNextBus(event, context);
 
@@ -68,19 +68,7 @@ getNextBus = (event, context) => {
 
     if(endpoint)
     {
-        var body = "";
-        request.get(endpoint, (response) => {
-            response.on('data', (chunk) => { body += chunk });
-            response.on('end', () => {
-
-                var buses = parseResponse(body);
-
-                var message = buses[0].lineName + " towards " + buses[0].direction + " expected in " + buses[0].minutes + " minutes and " + buses[0].seconds + " seconds";
-                context.succeed(
-                    generateResponse(
-                        buildSpeechletResponse(message, true), {}));
-            });
-        });
+        sendRequest(endpoint, context);
     }
     else
     {                
@@ -92,6 +80,21 @@ getNextBus = (event, context) => {
 };
 
 
+sendRequest = (endpoint, context) => {
+    var body = "";
+    request.get(endpoint, (response) => {
+        response.on('data', (chunk) => { body += chunk });
+        response.on('end', () => {
+            var buses = parseResponse(body);
+            var message = buses[0].lineName + " towards " + buses[0].direction + " expected in " + buses[0].minutes + " minutes and " + buses[0].seconds + " seconds";
+            context.succeed(
+                generateResponse(
+                    buildSpeechletResponse(message, true), {}));
+        });
+    });
+};
+
+
 parseResponse = (body) => {
   var buses = [];
   var data = JSON.parse(body);
@@ -100,12 +103,12 @@ parseResponse = (body) => {
   {
     var bus = {};
     console.log("bus time = "+data[i].timeToStation);
-    bus["timeToStation"] = data[i].timeToStation;
-    bus["lineName"] = data[i].lineName;
-    bus["direction"] = data[i].towards;
+    bus.timeToStation = data[i].timeToStation;
+    bus.lineName = data[i].lineName;
+    bus.direction = data[i].towards;
     var time = parseInt(data[i].timeToStation);
-    bus["minutes"] = Math.floor(time / 60);
-    bus["seconds"] = time - bus["minutes"] * 60;
+    bus.minutes = Math.floor(time / 60);
+    bus.seconds = time - bus.minutes * 60;
     buses.push(bus);
   }
   return buses;

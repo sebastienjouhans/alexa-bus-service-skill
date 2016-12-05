@@ -1,0 +1,21 @@
+{
+  "intents": [
+    {
+      "intent": "NextBusIntent",
+      "slots": [
+        {
+          "name": "BusDirection",
+          "type": "LIST_OF_DIRECTIONS"
+        }]
+    },
+    {
+      "intent": "AMAZON.HelpIntent"
+    },
+    {
+      "intent": "AMAZON.StopIntent"
+    },
+    {
+      "intent": "AMAZON.CancelIntent"
+    }
+  ]
+}
