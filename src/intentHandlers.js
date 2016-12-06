@@ -63,6 +63,8 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
             rsp.on('data', (chunk) => { body += chunk });
             rsp.on('end', () => {
                 var buses = parseResponse(body);
+                buses.sort(function(a, b){return a.timeToStation-b.timeToStation});
+                console.log("**bus time = "+ buses[0].timeToStation);
                 var message = buses[0].lineName + " towards " + buses[0].direction + " expected in " + buses[0].minutes + " minutes and " + buses[0].seconds + " seconds";
                 response.tell(message);    
             });
@@ -81,7 +83,7 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
             bus.timeToStation = data[i].timeToStation;
             bus.lineName = data[i].lineName;
             bus.direction = data[i].towards;
-            var time = parseInt(data[i].timeToStation);
+            var time = parseInt(bus.timeToStation);
             bus.minutes = Math.floor(time / 60);
             bus.seconds = time - bus.minutes * 60;
             buses.push(bus);
