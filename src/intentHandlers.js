@@ -34,20 +34,98 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
         var busDirection = intent.slots.BusDirection.value.toLowerCase();
         console.log(busDirection);
 
-        var endpoint = "";
+        var endpoint = [];
 
         if(busDirection == "bermondsey" || busDirection == "london bridge")
         {
-            endpoint = "https://api.tfl.gov.uk/Line/381/Arrivals?stopPointId=490006186N&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266";
+            endpoint.push("https://api.tfl.gov.uk/Line/381/Arrivals?stopPointId=490006186N&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266");
+            endpoint.push("https://api.tfl.gov.uk/Line/n381/Arrivals?stopPointId=490006186N&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266");
+            endpoint.push("https://api.tfl.gov.uk/Line/c10/Arrivals?stopPointId=490004539E&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266");
+
         }
         else if(busDirection == "canada water")
         {
-            endpoint = "https://api.tfl.gov.uk/Line/c10/Arrivals?stopPointId=490004539S&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266";
+            endpoint.push("https://api.tfl.gov.uk/Line/381/Arrivals?stopPointId=490006186S&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266");
+            endpoint.push("https://api.tfl.gov.uk/Line/n381/Arrivals?stopPointId=490006186S&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266");
+            endpoint.push("https://api.tfl.gov.uk/Line/c10/Arrivals?stopPointId=490004539S&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266");
+        }
+        else if(busDirection == "all")
+        {
+            endpoint.push("https://api.tfl.gov.uk/Line/381/Arrivals?stopPointId=490006186N&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266");
+            endpoint.push("https://api.tfl.gov.uk/Line/n381/Arrivals?stopPointId=490006186N&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266");
+            endpoint.push("https://api.tfl.gov.uk/Line/c10/Arrivals?stopPointId=490004539E&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266");
+            endpoint.push("https://api.tfl.gov.uk/Line/381/Arrivals?stopPointId=490006186S&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266");
+            endpoint.push("https://api.tfl.gov.uk/Line/n381/Arrivals?stopPointId=490006186S&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266");
+            endpoint.push("https://api.tfl.gov.uk/Line/c10/Arrivals?stopPointId=490004539S&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266");
         }
 
-        if(endpoint)
+        if(endpoint.length>0)
         {
-            sendRequest(endpoint, intent, session, response);
+            var buses = [];
+            getRequest(endpoint[0], function(body){
+                var newBuses1 = parseBuseResponse(body);
+                getRequest(endpoint[1], function(body){
+                    var newBuses2 = parseBuseResponse(body);
+                    getRequest(endpoint[2], function(body){
+                        var newBuses3 = parseBuseResponse(body);
+                        if(endpoint.length<6)
+                        {
+                            buses = buses.concat(newBuses1);
+                            buses = buses.concat(newBuses2);
+                            buses = buses.concat(newBuses3);
+                            buses.sort(function(a, b){return a.timeToStation-b.timeToStation});
+                            /*
+                            console.log("**bus time = "+ buses[0].timeToStation);
+                            console.log("**bus time = "+ buses[1].timeToStation);
+                            console.log("**bus time = "+ buses[2].timeToStation);
+                            console.log("**bus time = "+ buses[3].timeToStation);
+                            */
+                            var message = "";
+                            for(var i=0; i<buses.length; i++)
+                            {
+                                message += buses[i].lineName + " towards " + buses[i].direction + " expected in " + buses[i].minutes + " minutes and " + buses[i].seconds + " seconds, ";
+
+                                if(i==2)
+                                {
+                                    break;
+                                }
+                            }
+                            response.tell(message); 
+                        }
+                        else
+                        {
+                            getRequest(endpoint[3], function(body){
+                                var newBuses4= parseBuseResponse(body);
+                                getRequest(endpoint[4], function(body){
+                                    var newBuses5 = parseBuseResponse(body);
+                                   getRequest(endpoint[5], function(body){
+                                        var newBuses6 = parseBuseResponse(body);
+                                        buses = buses.concat(newBuses1);
+                                        buses = buses.concat(newBuses2);
+                                        buses = buses.concat(newBuses3);
+                                        buses = buses.concat(newBuses4);
+                                        buses = buses.concat(newBuses5);
+                                        buses = buses.concat(newBuses3);
+                                        buses.sort(function(a, b){return a.timeToStation-b.timeToStation});
+
+                                        var message = "";
+                                        for(var i=0; i<buses.length; i++)
+                                        {
+                                            message += buses[i].lineName + " towards " + buses[i].direction + " expected in " + buses[i].minutes + " minutes and " + buses[i].seconds + " seconds, ";
+
+                                            if(i==3)
+                                            {
+                                                break;
+                                            }
+                                        }
+                                        response.tell(message); 
+                                    }); 
+                                });
+                            });
+                        }
+                    });
+                });
+            });
         }
         else
         {                
@@ -56,23 +134,24 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
     };
 
 
-   var sendRequest = function (endpoint, intent, session, response) {
-        var body = "";
-        var request = require('https');
-        request.get(endpoint, (rsp) => {
-            rsp.on('data', (chunk) => { body += chunk });
-            rsp.on('end', () => {
-                var buses = parseResponse(body);
-                buses.sort(function(a, b){return a.timeToStation-b.timeToStation});
-                console.log("**bus time = "+ buses[0].timeToStation);
-                var message = buses[0].lineName + " towards " + buses[0].direction + " expected in " + buses[0].minutes + " minutes and " + buses[0].seconds + " seconds";
-                response.tell(message);    
-            });
+
+var getRequest = function(url, eventCallback) {
+    var request = require('https');
+    request.get(url, function(response) {
+        var body = '';
+        response.on('data', function (chunk) {
+            body += chunk;
         });
-    };
+        response.on('end', function () {
+            eventCallback(body);
+        });
+    }).on('error', function (e) {
+        console.log("Got error: ", e);
+    });
+};
 
 
-   var parseResponse = function(body) {
+   var parseBuseResponse = function(body) {
         var buses = [];
         var data = JSON.parse(body);
         console.log(body);
