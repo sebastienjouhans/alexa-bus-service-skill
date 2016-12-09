@@ -14,7 +14,6 @@ var skillContext = {};
  */
 var BusService = function () {
     AlexaSkill.call(this, APP_ID);
-    skillContext.needMoreHelp = true;
 };
 
 
