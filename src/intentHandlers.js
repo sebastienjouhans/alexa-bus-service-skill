@@ -6,7 +6,7 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
     intentHandlers.NextBusToIntent = function (intent, session, response) {
         try {
             var busDirection = getBusDirection(intent);
-            if(null)
+            if(busDirection == null)
             {
                 response.tell("sorry I did not reconize the destination.");    
                 return;
@@ -64,7 +64,7 @@ var getBusDirection = function(intent) {
 
 var  getBuses = function (busDirection, response) {
 
-    console.log("bus direction "+busDirection);
+    //console.log("bus direction "+busDirection);
 
     var endpoint = [];
 
@@ -109,16 +109,11 @@ var  getBuses = function (busDirection, response) {
                         buses = buses.concat(newBuses2);
                         buses = buses.concat(newBuses3);
                         buses.sort(function(a, b){return a.timeToStation-b.timeToStation});
-                        /*
-                        console.log("**bus time = "+ buses[0].timeToStation);
-                        console.log("**bus time = "+ buses[1].timeToStation);
-                        console.log("**bus time = "+ buses[2].timeToStation);
-                        console.log("**bus time = "+ buses[3].timeToStation);
-                        */
+
                         var alexaResponse = getAlexaResponse(buses, false);
                         response.tellWithCard(alexaResponse.message, 
-                                            "Buses to "+ busDirection, 
-                                            alexaResponse.cardContent); 
+                                                "Buses to "+ busDirection, 
+                                                alexaResponse.cardContent); 
                     }
                     else
                     {
@@ -136,17 +131,18 @@ var  getBuses = function (busDirection, response) {
                                     buses = buses.concat(newBuses6);
                                     buses.sort(function(a, b){return a.timeToStation-b.timeToStation});
 
-                                    var alexaResponse = getAlexaResponse(buses, true);
+                                    var alexaResponse = getAlexaResponse(buses, busDirection);
                                     response.tellWithCard(alexaResponse.message, 
-                                                    "Buses to Canada Water and London Bridges", 
-                                                    alexaResponse.cardContent);
+                                                            "Buses to Canada Water and London Bridges", 
+                                                            alexaResponse.cardContent);
                                 }); 
                             });
                         });
                     }
                 });
             });
-        }, function(){                
+        }, 
+        function(){                
             response.tell("I am sorry but Bus service wasn't able to get the bus' timetable, please try again.");
         });
     }
@@ -157,15 +153,17 @@ var  getBuses = function (busDirection, response) {
 };
 
 
-var getAlexaResponse = function (buses, isAllDirection){
+var getAlexaResponse = function (buses, busDirection){
     var message = "";
     var cardContent = "";
+    var isAllDirection = busDirection == "all" || busDirection == "everywhere" || busDirection == "anywhere";
+    var totalBuses = isAllDirection ? 3 : 2;
     for(var i=0; i<buses.length; i++)
     {
-        message += buses[i].lineName + " towards " + buses[i].direction + " expected in " + buses[i].minutes + " minutes and " + buses[i].seconds + " seconds, ";
+        message += "Buses to " + busDirection, + buses[i].lineName + " towards " + buses[i].direction + " expected in " + buses[i].minutes + " minutes and " + buses[i].seconds + " seconds, ";
         let direction = (isAllDirection ? " to " + buses[i].direction : "");
         cardContent += "- " +buses[i].lineName + direction + " in " + buses[i].minutes + " mins and " + buses[i].seconds + " secs\n";
-        if(i==2)
+        if(i==totalBuses)
         {
             break;
         }
@@ -199,7 +197,6 @@ var parseBuseResponse = function(body) {
     for(var i=0; i<data.length; i++)
     {
         var bus = {};
-        console.log("bus time = "+ data[i].timeToStation);
         bus.timeToStation = data[i].timeToStation;
         bus.lineName = data[i].lineName;
         bus.direction = data[i].towards;
