@@ -110,7 +110,7 @@ var  getBuses = function (busDirection, response) {
                         buses = buses.concat(newBuses3);
                         buses.sort(function(a, b){return a.timeToStation-b.timeToStation});
 
-                        var alexaResponse = getAlexaResponse(buses, false);
+                        var alexaResponse = getAlexaResponse(buses, busDirection);
                         response.tellWithCard(alexaResponse.message, 
                                                 "Buses to "+ busDirection, 
                                                 alexaResponse.cardContent); 
@@ -154,13 +154,13 @@ var  getBuses = function (busDirection, response) {
 
 
 var getAlexaResponse = function (buses, busDirection){
-    var message = "";
+    var message = "Buses to " + busDirection + ", ";
     var cardContent = "";
     var isAllDirection = busDirection == "all" || busDirection == "everywhere" || busDirection == "anywhere";
     var totalBuses = isAllDirection ? 3 : 2;
     for(var i=0; i<buses.length; i++)
     {
-        message += "Buses to " + busDirection + ", " + buses[i].lineName + " towards " + buses[i].direction + " expected in " + buses[i].minutes + " minutes and " + buses[i].seconds + " seconds, ";
+        message += buses[i].lineName + " towards " + buses[i].direction + " expected in " + buses[i].minutes + " minutes and " + buses[i].seconds + " seconds, ";
         let direction = (isAllDirection ? " to " + buses[i].direction : "");
         cardContent += "- " +buses[i].lineName + direction + " in " + buses[i].minutes + " mins and " + buses[i].seconds + " secs\n";
         if(i==totalBuses)
