@@ -160,7 +160,7 @@ var getAlexaResponse = function (buses, busDirection){
     var totalBuses = isAllDirection ? 3 : 2;
     for(var i=0; i<buses.length; i++)
     {
-        message += "Buses to " + busDirection, + buses[i].lineName + " towards " + buses[i].direction + " expected in " + buses[i].minutes + " minutes and " + buses[i].seconds + " seconds, ";
+        message += "Buses to " + busDirection + ", " + buses[i].lineName + " towards " + buses[i].direction + " expected in " + buses[i].minutes + " minutes and " + buses[i].seconds + " seconds, ";
         let direction = (isAllDirection ? " to " + buses[i].direction : "");
         cardContent += "- " +buses[i].lineName + direction + " in " + buses[i].minutes + " mins and " + buses[i].seconds + " secs\n";
         if(i==totalBuses)
