@@ -154,7 +154,8 @@ var  getBuses = function (busDirection, response) {
 
 
 var getAlexaResponse = function (buses, busDirection){
-    var message = "Buses to " + busDirection + ", ";
+    var busTitle = busDirection == "all" ? "Canada Water and London Bridges" : busDirection;
+    var message = "Buses to " + busTitle + ", ";
     var cardContent = "";
     var isAllDirection = busDirection == "all" || busDirection == "everywhere" || busDirection == "anywhere";
     var totalBuses = isAllDirection ? 3 : 2;
