@@ -109,6 +109,7 @@ var  getBuses = function (busDirection, response) {
                         buses = buses.concat(newBuses2);
                         buses = buses.concat(newBuses3);
                         buses.sort(function(a, b){return a.timeToStation-b.timeToStation});
+                        buses = removeCloseBuses(buses);
 
                         var alexaResponse = getAlexaResponse(buses, busDirection);
                         response.tellWithCard(alexaResponse.message, 
@@ -130,6 +131,7 @@ var  getBuses = function (busDirection, response) {
                                     buses = buses.concat(newBuses5);
                                     buses = buses.concat(newBuses6);
                                     buses.sort(function(a, b){return a.timeToStation-b.timeToStation});
+                                    buses = removeCloseBuses(buses);
 
                                     var alexaResponse = getAlexaResponse(buses, busDirection);
                                     response.tellWithCard(alexaResponse.message, 
@@ -172,6 +174,18 @@ var getAlexaResponse = function (buses, busDirection){
     return {message:message, cardContent:cardContent};
 };
 
+
+var removeCloseBuses = function(buses)
+{
+    for(var i = buses.length - 1; i >= 0; i--) 
+    {
+        if(parseInt(buses[i].minutes)==0) 
+        {
+            buses.splice(i, 1);
+        }
+    }
+    return buses;
+};
 
 
 var getRequest = function(url, eventCallback, errorCallback) {
