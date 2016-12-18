@@ -5,7 +5,9 @@ var registerEventHandlers = function (eventHandlers, skillContext) {
     };
 
     eventHandlers.onLaunch = function (launchRequest, session, response) {
-        response.ask("Welcome to the bus service skill. You can say for example, when is my next bus to Canada Water or London Bridge");
+        var speechText = "Welcome to the bus service skill. You can say for example, when is the next bus to Canada Water or London Bridge.";
+        var repromptText = "For instructions on what you can say, please say help me.";
+        response.ask(speechText, repromptText);
     };
 };
 exports.register = registerEventHandlers;
