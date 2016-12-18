@@ -1,12 +1,15 @@
 {
   "intents": [
     {
-      "intent": "NextBusIntent",
+      "intent": "NextBusToIntent",
       "slots": [
         {
           "name": "BusDirection",
           "type": "LIST_OF_DIRECTIONS"
         }]
+    },
+    {
+      "intent": "NextBusIntent"
     },
     {
       "intent": "AMAZON.HelpIntent"
