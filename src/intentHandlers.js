@@ -5,42 +5,47 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
 
     intentHandlers.NextBusToIntent = function (intent, session, response) {
         try {
-            var busDirection = getBusDirection(intent);
+            let busDirection = getBusDirection(intent);
+            console.log("## NextBusToIntent "+busDirection);    
             if(busDirection == null)
             {
-                response.tell("sorry I did not reconize the destination.");    
+                response.ask("Sorry I didn't reconize the destination, please try again.");    
+                console.log("## NextBusToIntent - did not reconize the destination");
                 return;
             }
             getBuses(busDirection, response);
         } 
         catch(error) { 
             console.log("error "+error);
-            response.tell("I am sorry but Bus service wasn't able to get the bus' timetable, please try again");
+            response.ask("Sorry but I wasn't able to get the bus' timetable at this time, please try again.");
             //context.fail("Exception: ${error}"); 
         }
     };
 
     intentHandlers.NextBusIntent = function (intent, session, response) {
-        try {            
+        try {        
+            console.log("## NextBusIntent");    
             getBuses("all", response);
         } 
         catch(error) { 
             console.log("error "+error);
-            response.tell("I am sorry but Bus service wasn't able to get the bus' timetable, please try again");
+            response.ask("Sorry but I wasn't able to get the bus' timetable at this time, please try again.");
             //context.fail("Exception: ${error}"); 
         }
     };
 
     intentHandlers['AMAZON.HelpIntent'] = function (intent, session, response) {
-        response.tell("You can say for example, when is my next bus to Canada Water. You also can replace Canada Water with another supported directions such as London Bridge, Bermondsey or all. Using all will give buses for all directions.");
+        response.ask("You can say for example, when is the next bus to Canada Water. You also can replace Canada Water with another supported directions such as London Bridge, Bermondsey or all. Using all will give buses for all directions.");
     };
 
     intentHandlers['AMAZON.CancelIntent'] = function (intent, session, response) {
-
+        var speechOutput = "Goodbye";
+        response.tell(speechOutput);
     };
 
     intentHandlers['AMAZON.StopIntent'] = function (intent, session, response) {
-
+        var speechOutput = "Goodbye";
+        response.tell(speechOutput);
     };
 };
 
@@ -52,9 +57,10 @@ var getBusDirection = function(intent) {
     
     if(intent.slots.BusDirection && intent.slots.BusDirection.value)
     {
+        console.log("## getBusDirection - "+intent.slots.BusDirection.value.toLowerCase()); 
         return intent.slots.BusDirection.value.toLowerCase();
     }
-   
+    console.log("## getBusDirection - empty string"); 
     return null;
 };
 
@@ -64,13 +70,14 @@ var getBusDirection = function(intent) {
 
 var  getBuses = function (busDirection, response) {
 
-    //console.log("bus direction "+busDirection);
+    console.log("## getBuses - bus direction "+busDirection);
 
     var endpoint = [];
 
     if(busDirection == "bermondsey" ||
         busDirection == "london bridge")
     {
+        console.log("## getBuses endpoint 1 - "+busDirection);
         endpoint.push("https://api.tfl.gov.uk/Line/381/Arrivals?stopPointId=490006186N&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266");
         endpoint.push("https://api.tfl.gov.uk/Line/n381/Arrivals?stopPointId=490006186N&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266");
         endpoint.push("https://api.tfl.gov.uk/Line/c10/Arrivals?stopPointId=490004539E&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266");
@@ -78,6 +85,7 @@ var  getBuses = function (busDirection, response) {
     }
     else if(busDirection == "canada water")
     {
+        console.log("## getBuses endpoint 2 - "+busDirection);
         endpoint.push("https://api.tfl.gov.uk/Line/381/Arrivals?stopPointId=490006186S&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266");
         endpoint.push("https://api.tfl.gov.uk/Line/n381/Arrivals?stopPointId=490006186S&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266");
         endpoint.push("https://api.tfl.gov.uk/Line/c10/Arrivals?stopPointId=490004539S&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266");
@@ -86,6 +94,7 @@ var  getBuses = function (busDirection, response) {
             busDirection == "anywhere" || 
             busDirection == "all")
     {
+        console.log("## getBuses endpoint 3 - "+busDirection);
         endpoint.push("https://api.tfl.gov.uk/Line/381/Arrivals?stopPointId=490006186N&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266");
         endpoint.push("https://api.tfl.gov.uk/Line/n381/Arrivals?stopPointId=490006186N&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266");
         endpoint.push("https://api.tfl.gov.uk/Line/c10/Arrivals?stopPointId=490004539E&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266");
@@ -115,6 +124,7 @@ var  getBuses = function (busDirection, response) {
                         response.tellWithCard(alexaResponse.message, 
                                                 "Buses to "+ busDirection, 
                                                 alexaResponse.cardContent); 
+                        console.log("## 3 bus requests success "+busDirection); 
                     }
                     else
                     {
@@ -135,28 +145,57 @@ var  getBuses = function (busDirection, response) {
 
                                     var alexaResponse = getAlexaResponse(buses, busDirection);
                                     response.tellWithCard(alexaResponse.message, 
-                                                            "Buses to Canada Water and London Bridges", 
+                                                            "Buses to Canada Water and London Bridge", 
                                                             alexaResponse.cardContent);
+                                    console.log("## 6 bus requests success "+busDirection);                                     
+                                }, 
+                                function(){
+                                    console.log("## data load error - bus 1");           
+                                    cantFindBuseTimetableResponse(response);
                                 }); 
+                            }, 
+                            function(){
+                                console.log("## data load error - bus 2");    
+                                cantFindBuseTimetableResponse(response);
                             });
+                        }, 
+                        function(){
+                            console.log("## data load error - bus 3");                    
+                            cantFindBuseTimetableResponse(response);
                         });
                     }
+                }, 
+                function(){
+                    console.log("## data load error - bus 4");    
+                    cantFindBuseTimetableResponse(response);
                 });
+            }, 
+            function(){
+                console.log("## data load error - bus 5"); 
+                cantFindBuseTimetableResponse(response);
             });
         }, 
-        function(){                
-            response.tell("I am sorry but Bus service wasn't able to get the bus' timetable, please try again.");
+        function(){
+            console.log("## data load error - bus 6");    
+            cantFindBuseTimetableResponse(response);
         });
     }
     else
-    {                
-        response.tell("sorry I did not reconize the destination.");    
+    {
+        response.ask("Sorry but I didn't reconize the destination, please try again.");    
+        console.log("## getBuses - no endpoint"); 
     }          
 };
 
 
+var cantFindBuseTimetableResponse = function(response){
+    response.ask("Sorry but I wasn't able to get the bus' timetable at this time, please try again.");
+    console.log("## NextBusToIntent - can't find timetable");
+};
+
+
 var getAlexaResponse = function (buses, busDirection){
-    var busTitle = busDirection == "all" ? "Canada Water and London Bridges" : busDirection;
+    var busTitle = busDirection == "all" ? "Canada Water and London Bridge" : busDirection;
     var message = "Buses to " + busTitle + ", ";
     var cardContent = "";
     var isAllDirection = busDirection == "all" || busDirection == "everywhere" || busDirection == "anywhere";
