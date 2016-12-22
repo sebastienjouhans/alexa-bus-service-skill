@@ -1,5 +1,6 @@
 'use strict';
 
+var async = require('async');
 
 var registerIntentHandlers = function (intentHandlers, skillContext) {
 
@@ -67,7 +68,7 @@ var getBusDirection = function(intent) {
 
 
 
-
+/*
 var  getBuses = function (busDirection, response) {
 
     console.log("## getBuses - bus direction "+busDirection);
@@ -186,6 +187,109 @@ var  getBuses = function (busDirection, response) {
         console.log("## getBuses - no endpoint"); 
     }          
 };
+*/
+
+
+var getBuses = function (busDirection, response) {
+    var endpoint = [];
+
+    if(busDirection == "bermondsey" ||
+        busDirection == "london bridge")
+    {
+        console.log("## getBuses endpoint 1 - "+busDirection);
+        endpoint.push("https://api.tfl.gov.uk/Line/381/Arrivals?stopPointId=490006186N&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266");
+        endpoint.push("https://api.tfl.gov.uk/Line/n381/Arrivals?stopPointId=490006186N&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266");
+        endpoint.push("https://api.tfl.gov.uk/Line/c10/Arrivals?stopPointId=490004539E&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266");
+
+    }
+    else if(busDirection == "canada water")
+    {
+        console.log("## getBuses endpoint 2 - "+busDirection);
+        endpoint.push("https://api.tfl.gov.uk/Line/381/Arrivals?stopPointId=490006186S&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266");
+        endpoint.push("https://api.tfl.gov.uk/Line/n381/Arrivals?stopPointId=490006186S&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266");
+        endpoint.push("https://api.tfl.gov.uk/Line/c10/Arrivals?stopPointId=490004539S&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266");
+    }
+    else if(busDirection == "everywhere" || 
+            busDirection == "anywhere" || 
+            busDirection == "all")
+    {
+        console.log("## getBuses endpoint 3 - "+busDirection);
+        endpoint.push("https://api.tfl.gov.uk/Line/381/Arrivals?stopPointId=490006186N&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266");
+        endpoint.push("https://api.tfl.gov.uk/Line/n381/Arrivals?stopPointId=490006186N&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266");
+        endpoint.push("https://api.tfl.gov.uk/Line/c10/Arrivals?stopPointId=490004539E&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266");
+        endpoint.push("https://api.tfl.gov.uk/Line/381/Arrivals?stopPointId=490006186S&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266");
+        endpoint.push("https://api.tfl.gov.uk/Line/n381/Arrivals?stopPointId=490006186S&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266");
+        endpoint.push("https://api.tfl.gov.uk/Line/c10/Arrivals?stopPointId=490004539S&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266");
+    }
+
+    if(endpoint.length>0)
+    {
+        var busRequests = [];
+        for(var i=0; i<endpoint.length; i++)
+        {
+            busRequests.push(function(callback){
+                getRequest(endpoint[0], function(body){
+                    callback(null, parseBuseResponse(body), response, busDirection);
+                }, function(){
+                    callback({message: "## data load error - bus "+i}, null, response, null);
+                });
+            });
+        }
+
+        async.parallel(busRequests, onAsyncComplete);
+    }
+    else
+    {
+        response.ask("Sorry but I didn't reconize the destination, please try again.");    
+        console.log("## getBuses - no endpoint"); 
+    }
+};
+
+
+var onAsyncComplete = function(err, results){
+    console.log("---> "+results.length);
+    console.log("---> "+results);
+    console.log("---> "+results[0]);
+    console.log("---> "+busDirection);
+
+    if(err)
+    {
+        //console.log(err.message);
+        cantFindBuseTimetableResponse(response);
+    }
+    else if(results)
+    {
+        var response = results[0][1];
+        var busDirection = results[0][2];
+        var buses = [];
+        for(var i=0; i<results.lengths; i++)
+        {
+            buses.concat(results[i][0]);
+        }
+        buses.sort(function(a, b){return a.timeToStation-b.timeToStation});
+        buses = removeCloseBuses(buses);
+
+        if(buses.length==0)
+        {
+            cantFindBuseTimetableResponse(response);
+            console.log("## no buses from request "+busDirection);
+        }
+        else
+        {
+            var alexaResponse = getAlexaResponse(buses, busDirection);
+
+            response.tellWithCard(alexaResponse.message, 
+                                    "Buses to Canada Water and London Bridge", 
+                                    alexaResponse.cardContent);
+
+            console.log("## 6 bus requests success "+busDirection);
+        }
+    }
+    else
+    {
+        cantFindBuseTimetableResponse(response);
+    }
+};
 
 
 var cantFindBuseTimetableResponse = function(response){
@@ -235,6 +339,7 @@ var getRequest = function(url, eventCallback, errorCallback) {
             body += chunk;
         });
         response.on('end', function () {
+            console.log("end = "+body);
             eventCallback(body);
         });
     }).on('error', function (e) {
