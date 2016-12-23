@@ -123,11 +123,10 @@ var onAsyncCompleteSuccess = function (results, response, busDirection) {
 
       for (var j = 0; j < results[i].length; j++) {
         var newBuses = results[i][j];
-        console.log(newBuses.lineName + ': ' + newBuses.timeToStation);
         buses.push(newBuses);
       }
     }
-    console.log(buses.length);
+    
     buses.sort(function (a, b) { return a.timeToStation - b.timeToStation });
     buses = removeCloseBuses(buses);
 
