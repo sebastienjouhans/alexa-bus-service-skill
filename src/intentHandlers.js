@@ -47,7 +47,7 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
 };
 
 
-var getBusDirection = function (intent) {    
+var getBusDirection = function (intent) {
   if (intent.slots.BusDirection && intent.slots.BusDirection.value) {
     console.log('## getBusDirection - ' + intent.slots.BusDirection.value.toLowerCase()); 
     return intent.slots.BusDirection.value.toLowerCase();
@@ -126,7 +126,7 @@ var onAsyncCompleteSuccess = function (results, response, busDirection) {
         buses.push(newBuses);
       }
     }
-    
+
     buses.sort(function (a, b) { return a.timeToStation - b.timeToStation });
     buses = removeCloseBuses(buses);
 
@@ -174,7 +174,6 @@ var getAlexaResponse = function (buses, busDirection) {
 
 var removeCloseBuses = function (buses) {
   for (var i = buses.length - 1; i >= 0; i--) {
-    console.log(buses[i].lineName + ': ' + buses[i].minutes);
     if (parseInt(buses[i].minutes) === 0) {
       buses.splice(i, 1);
     }
@@ -191,7 +190,6 @@ var getRequest = function (url, eventCallback, errorCallback) {
       body += chunk;
     });
     response.on('end', function () {
-      console.log('end = ' + body);
       eventCallback(body);
     });
   }).on('error', function (e) {
