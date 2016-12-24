@@ -6,28 +6,28 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
   intentHandlers.NextBusToIntent = function (intent, session, response) {
     try {
       let busDirection = getBusDirection(intent);
-      console.log('## NextBusToIntent ' + busDirection);    
+      console.log('## NextBusToIntent ' + busDirection);
       if (busDirection == null) {
-        response.ask("Sorry I didn't reconize the destination, please try again.");    
+        response.ask("Sorry I didn't reconize the destination, please try again.");
         console.log('## NextBusToIntent - did not reconize the destination');
         return;
       }
       getBuses(busDirection, response);
-    } catch (error) { 
+    } catch (error) {
       console.log('error ' + error);
       response.ask("Sorry but I wasn't able to get the bus' timetable at this time, please try again.");
-            //context.fail("Exception: ${error}"); 
+            //context.fail("Exception: ${error}");
     }
   };
 
   intentHandlers.NextBusIntent = function (intent, session, response) {
-    try {        
-      console.log('## NextBusIntent');    
+    try {
+      console.log('## NextBusIntent');
       getBuses('all', response);
-    } catch (error) { 
+    } catch (error) {
       console.log('error ' + error);
       response.ask("Sorry but I wasn't able to get the bus' timetable at this time, please try again.");
-    //context.fail("Exception: ${error}"); 
+    //context.fail("Exception: ${error}");
     }
   };
 
@@ -49,10 +49,10 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
 
 var getBusDirection = function (intent) {
   if (intent.slots.BusDirection && intent.slots.BusDirection.value) {
-    console.log('## getBusDirection - ' + intent.slots.BusDirection.value.toLowerCase()); 
+    console.log('## getBusDirection - ' + intent.slots.BusDirection.value.toLowerCase());
     return intent.slots.BusDirection.value.toLowerCase();
   }
-  console.log('## getBusDirection - empty string'); 
+  console.log('## getBusDirection - empty string');
   return null;
 };
 
@@ -92,8 +92,8 @@ var getBuses = function (busDirection, response) {
       }
     });
   } else {
-    response.ask("Sorry but I didn't reconize the destination, please try again.");    
-    console.log('## getBuses - no endpoint'); 
+    response.ask("Sorry but I didn't reconize the destination, please try again.");
+    console.log('## getBuses - no endpoint');
   }
 };
 
@@ -137,7 +137,7 @@ var onAsyncCompleteSuccess = function (results, response, busDirection) {
       var alexaResponse = getAlexaResponse(buses, busDirection);
 
       response.tellWithCard(alexaResponse.message,
-                                    'Buses to Canada Water and London Bridge', 
+                                    'Buses to Canada Water and London Bridge',
                                     alexaResponse.cardContent);
 
       console.log('## 6 bus requests success ' + busDirection);
