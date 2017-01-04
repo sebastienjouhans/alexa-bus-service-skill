@@ -1,6 +1,7 @@
 'use strict';
 
 var async = require('async');
+var moment = require('moment-timezone');
 
 var registerIntentHandlers = function (intentHandlers, skillContext) {
   intentHandlers.NextBusToIntent = function (intent, session, response) {
@@ -157,7 +158,7 @@ var cantFindBuseTimetableResponse = function (response) {
 var getAlexaResponse = function (buses, busDirection) {
   var busTitle = busDirection === 'all' ? 'Canada Water and London Bridge' : busDirection;
   var message = 'Buses to ' + busTitle + ', ';
-  var cardContent = '';
+  var cardContent = moment().tz('Europe/London').format('HH:mm:ss') + '\n';
   var isAllDirection = busDirection === 'all' || busDirection === 'everywhere' || busDirection === 'anywhere';
   var totalBuses = isAllDirection ? 3 : 2;
   for (var i = 0; i < buses.length; i++) {
