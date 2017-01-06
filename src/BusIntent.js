@@ -91,6 +91,17 @@ BusIntent.prototype = (function () {
     return buses;
   };
 
+  var getBusesData = function (endpoint, callback) {
+    let https = new HttpsRequest();
+    https.get(endpoint, function (body) {
+      let busParser = new BusParser();
+      callback(null, busParser.parse(body));
+    },
+    function () {
+      callback(endpoint, null);
+    });
+  };
+
   return {
     getBuses: function (busDirection, response) {
       var endpoint = [];
@@ -119,7 +130,7 @@ BusIntent.prototype = (function () {
       }
 
       if (endpoint.length > 0) {
-        async.map(endpoint, this.getBusesData, function (err, result) {
+        async.map(endpoint, getBusesData, function (err, result) {
           if (!err) {
             onAsyncCompleteSuccess(result, response, busDirection);
           } else {
@@ -139,17 +150,6 @@ BusIntent.prototype = (function () {
       }
       console.log('## getBusDirection - empty string');
       return null;
-    },
-
-    getBusesData: function (endpoint, callback) {
-      let https = new HttpsRequest();
-      https.get(endpoint, function (body) {
-        let busParser = new BusParser();
-        callback(null, busParser.parse(body));
-      },
-        function () {
-          callback(endpoint, null);
-        });
     }
   };
 })();
