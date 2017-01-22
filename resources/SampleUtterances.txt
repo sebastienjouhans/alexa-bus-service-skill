@@ -19,5 +19,7 @@ NextBusesIntent when is the next bus
 NextBusesIntent when is my next bus
 
 
-NextBusToIntent when is the next {Route} to {BusDirection}
+NextBusToIntent for {Route} to {BusDirection}
+NextBusToIntent {Route} to {BusDirection}
 NextBusToIntent when is the {Route} to {BusDirection}
+NextBusToIntent when is the {Route} bus to {BusDirection}
