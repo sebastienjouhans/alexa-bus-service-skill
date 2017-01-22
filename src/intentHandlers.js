@@ -62,16 +62,24 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
   };
 
   intentHandlers['AMAZON.HelpIntent'] = function (intent, session, response) {
-    response.ask('You can say for example, when is the next bus to Canada Water. You also can replace Canada Water with another supported directions such as London Bridge, Bermondsey or all. Using all will give buses for all directions.');
+    let speechOutput = 'You can say for example, when is the next bus to Canada Water. You also can replace Canada Water with another supported directions such as London Bridge, Bermondsey or all. Using all will give buses for all directions.';
+    let cardTitle = 'Help';
+    let cardContent = '- Alexa ask bus service when is the next bus to Canada Water\n' +
+                      '- Alexa ask bus service when is the next bus to London Bridge\n' +
+                      '- Alexa ask bus service when is the next bus to all\n' +
+                      '- Alexa ask bus service when is the next bus\n';
+    response.tellWithCard(speechOutput,
+                          cardTitle,
+                          cardContent);
   };
 
   intentHandlers['AMAZON.CancelIntent'] = function (intent, session, response) {
-    var speechOutput = 'Goodbye';
+    let speechOutput = 'Goodbye';
     response.tell(speechOutput);
   };
 
   intentHandlers['AMAZON.StopIntent'] = function (intent, session, response) {
-    var speechOutput = 'Goodbye';
+    let speechOutput = 'Goodbye';
     response.tell(speechOutput);
   };
 };
