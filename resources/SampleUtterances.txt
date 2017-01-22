@@ -1,19 +1,17 @@
-NextBusToIntent when is the next bus to {BusDirection}
-NextBusToIntent when is the next bus going to {BusDirection}
-NextBusToIntent when is the next bus towards {BusDirection}
-NextBusToIntent when is the next bus going towards {BusDirection}
-NextBusToIntent when is my next bus to {BusDirection}
-NextBusToIntent when is my next bus going to {BusDirection}
-NextBusToIntent when is my next bus towards {BusDirection}
-NextBusToIntent when is my next bus going towards {BusDirection}
-NextBusToIntent when are the next buses to {BusDirection}
-NextBusToIntent when are the next buses going to {BusDirection}
-NextBusToIntent when are the next buses towards {BusDirection}
-NextBusToIntent when are the next buses going towards {BusDirection}
-NextBusToIntent when are my next buses to {BusDirection}
-NextBusToIntent when are my next buses going to {BusDirection}
-NextBusToIntent when are my next buses towards {BusDirection}
-NextBusToIntent when are my next buses going towards {BusDirection}
+NextBusesIntent when is the next bus
+NextBusesIntent when is my next bus
 
-NextBusIntent when is the next bus
-NextBusIntent when is my next bus
+NextBusToIntent when is the next {Route} to {BusDirection}
+NextBusToIntent when is the {Route} to {BusDirection}
+NextBusToIntent {Route} to {BusDirection}
+NextBusToIntent for the {Route} to {BusDirection}
+
+NextBusesToIntent when is the next bus to {BusDirection}
+NextBusesToIntent when is the next bus going to {BusDirection}
+NextBusesToIntent when is the next bus towards {BusDirection}
+NextBusesToIntent when is my next bus to {BusDirection}
+NextBusesToIntent when is my next bus going to {BusDirection}
+NextBusesToIntent when is my next bus towards {BusDirection}
+NextBusesToIntent when are the next buses to {BusDirection}
+NextBusesToIntent when are the next buses going to {BusDirection}
+NextBusesToIntent when are the next buses towards {BusDirection}

@@ -4,12 +4,24 @@
       "intent": "NextBusToIntent",
       "slots": [
         {
+          "name": "Route",
+          "type": "LIST_OF_ROUTES"
+        },
+        {
           "name": "BusDirection",
           "type": "LIST_OF_DIRECTIONS"
         }]
     },
     {
-      "intent": "NextBusIntent"
+      "intent": "NextBusesIntent"
+    },
+    {
+      "intent": "NextBusesToIntent",
+      "slots": [
+        {
+          "name": "BusDirection",
+          "type": "LIST_OF_DIRECTIONS"
+        }]
     },
     {
       "intent": "AMAZON.HelpIntent"

@@ -7,7 +7,7 @@ var HttpsRequest = require('./HttpsRequest');
 var BusParser = require('./BusDataParser');
 
 
-function BusIntent () {
+function BusIntent() {
 }
 
 BusIntent.prototype = (function () {
@@ -23,7 +23,7 @@ BusIntent.prototype = (function () {
     cantFindBuseTimetableResponse(response);
   };
 
-  var onAsyncCompleteSuccess = function (results, response, busDirection) {
+  var onAsyncCompleteSuccess = function (results, response, busDirection, route) {
     if (results) {
       var buses = [];
       for (var i = 0; i < results.length; i++) {
@@ -44,11 +44,11 @@ BusIntent.prototype = (function () {
         cantFindBuseTimetableResponse(response);
         console.log('## no buses from request ' + busDirection);
       } else {
-        let alexaResponse = getAlexaResponse(buses, busDirection);        
-        
+        let alexaResponse = getAlexaResponse(buses, busDirection, route);
+
         response.tellWithCard(alexaResponse.message,
-                                      alexaResponse.title,
-                                      alexaResponse.cardContent);
+          alexaResponse.title,
+          alexaResponse.cardContent);
 
         console.log('## 6 bus requests success ' + busDirection);
       }
@@ -62,11 +62,11 @@ BusIntent.prototype = (function () {
     console.log("## NextBusToIntent - can't find timetable");
   };
 
-  var getAlexaResponse = function (buses, busDirection) {
+  var getAlexaResponse = function (buses, busDirection, route) {
     let isAllDirection = busDirection === 'all' || busDirection === 'everywhere' || busDirection === 'anywhere';
-    
+
     let directionTitle = isAllDirection ? 'Canada Water and London Bridge' : busDirection;
-    let title = 'Buses to ' + directionTitle;
+    let title = route == null ? 'Buses to ' + directionTitle : route + ' to ' + directionTitle;
     let message = title + ', ';
     let cardContent = moment().tz('Europe/London').format('HH:mm:ss') + '\n';
     let totalBuses = isAllDirection ? 3 : 2;
@@ -79,7 +79,7 @@ BusIntent.prototype = (function () {
         break;
       }
     }
-    return {message: message, cardContent: cardContent, title: title};
+    return { message: message, cardContent: cardContent, title: title };
   };
 
   var removeCloseBuses = function (buses) {
@@ -97,29 +97,68 @@ BusIntent.prototype = (function () {
       let busParser = new BusParser();
       callback(null, busParser.parse(body));
     },
-    function () {
-      callback(endpoint, null);
-    });
+      function () {
+        callback(endpoint, null);
+      });
   };
 
   return {
+    getBus: function (route, busDirection, response) {
+      var endpoint = [];
+
+      let busDirectionLowercase = busDirection.toLowerCase();
+      let routeLowercase = route.toLowerCase();
+
+      if (routeLowercase === 'c 10' && (busDirectionLowercase === 'bermondsey' ||
+        busDirectionLowercase === 'london bridge')) {
+        console.log('## getBuses endpoint 1 - ' + busDirectionLowercase + ', ' + route);
+        endpoint.push(LONDON_BRIDGE_C10);
+      } else if (rourouteLowercasete === 'c 10' && busDirectionLowercase === 'canada water') {
+        console.log('## getBuses endpoint 2 - ' + busDirecbusDirectionLowercasetion + ', ' + route);
+        endpoint.push(CANADA_WATER_C10);
+      } else if (routeLowercase === '381' && (busDirectionLowercase === 'bermondsey' || busDirectionLowercase === 'london bridge')) {
+        console.log('## getBuses endpoint 3 - ' + busDirectionLowercase + ', ' + route);
+        endpoint.push(LONDON_BRIDGE_381);
+        endpoint.push(LONDON_BRIDGE_N381);
+      } else if (routeLowercase === '381' && busDirectionLowercase === 'canada water') {
+        console.log('## getBuses endpoint 4 - ' + busDirectionLowercase + ', ' + route);
+        endpoint.push(CANADA_WATER_381);
+        endpoint.push(CANADA_WATER_N381);
+      }
+
+      if (endpoint.length > 0) {
+        async.map(endpoint, getBusesData, function (err, result) {
+          if (!err) {
+            onAsyncCompleteSuccess(result, response, busDirection, route);
+          } else {
+            onAsyncCompleteFailed(err, response);
+          }
+        });
+      } else {
+        response.ask("Sorry but I didn't reconize the destination or the bus number, please try again.");
+        console.log('## getBus - no endpoint');
+      }
+    },
+
     getBuses: function (busDirection, response) {
       var endpoint = [];
 
-      if (busDirection === 'bermondsey' ||
-            busDirection === 'london bridge') {
+      let busDirectionLowercase = busDirection.toLowerCase();
+
+      if (busDirectionLowercase === 'bermondsey' ||
+        busDirectionLowercase === 'london bridge') {
         console.log('## getBuses endpoint 1 - ' + busDirection);
         endpoint.push(LONDON_BRIDGE_381);
         endpoint.push(LONDON_BRIDGE_N381);
         endpoint.push(LONDON_BRIDGE_C10);
-      } else if (busDirection === 'canada water') {
+      } else if (busDirectionLowercase === 'canada water') {
         console.log('## getBuses endpoint 2 - ' + busDirection);
         endpoint.push(CANADA_WATER_381);
         endpoint.push(CANADA_WATER_N381);
         endpoint.push(CANADA_WATER_C10);
-      } else if (busDirection === 'everywhere' ||
-                busDirection === 'anywhere' ||
-                busDirection === 'all') {
+      } else if (busDirectionLowercase === 'everywhere' ||
+        busDirectionLowercase === 'anywhere' ||
+        busDirectionLowercase === 'all') {
         console.log('## getBuses endpoint 3 - ' + busDirection);
         endpoint.push(LONDON_BRIDGE_381);
         endpoint.push(LONDON_BRIDGE_N381);
@@ -143,10 +182,19 @@ BusIntent.prototype = (function () {
       }
     },
 
+    getRoute: function (intent) {
+      if (intent.slots.Route && intent.slots.Route.value) {
+        console.log('## getRoute - ' + intent.slots.Route.value);
+        return intent.slots.Route.value;
+      }
+      console.log('## getRoute - empty string');
+      return null;
+    },
+
     getBusDirection: function (intent) {
       if (intent.slots.BusDirection && intent.slots.BusDirection.value) {
-        console.log('## getBusDirection - ' + intent.slots.BusDirection.value.toLowerCase());
-        return intent.slots.BusDirection.value.toLowerCase();
+        console.log('## getBusDirection - ' + intent.slots.BusDirection.value);
+        return intent.slots.BusDirection.value;
       }
       console.log('## getBusDirection - empty string');
       return null;
