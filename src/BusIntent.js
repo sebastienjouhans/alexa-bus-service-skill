@@ -62,11 +62,11 @@ BusIntent.prototype = (function () {
     console.log("## NextBusToIntent - can't find timetable");
   };
 
-  var getAlexaResponse = function (buses, busDirection) {
+  var getAlexaResponse = function (buses, busDirection, route) {
     let isAllDirection = busDirection === 'all' || busDirection === 'everywhere' || busDirection === 'anywhere';
-    
+
     let directionTitle = isAllDirection ? 'Canada Water and London Bridge' : busDirection;
-    let title = 'Buses to ' + directionTitle;
+    let title = isAllDirection ? 'Buses to ' + directionTitle : route + ' to ' + directionTitle;
     let message = title + ', ';
     let cardContent = moment().tz('Europe/London').format('HH:mm:ss') + '\n';
     let totalBuses = isAllDirection ? 3 : 2;
@@ -103,8 +103,41 @@ BusIntent.prototype = (function () {
   };
 
   return {
+    getBus: function (route, busDirection, response) {
+        endpoint.push(LONDON_BRIDGE_C10);
+      if (route === 'c 10' && (busDirection === 'bermondsey' || busDirection === 'london bridge')) {
+        endpoint.push(LONDON_BRIDGE_C10);        
+        console.log('## getBus endpoint 1 - ' + route + ', ' + busDirection);
+      } else if (route === 'c 10' && (busDirection === 'bermondsey' || busDirection === 'london bridge')) {
+        endpoint.push(LONDON_BRIDGE_381);
+        endpoint.push(LONDON_BRIDGE_N381);
+        console.log('## getBus endpoint 2 - ' + route + ', ' + busDirection);
+      } else if (route === 'c 10' && (busDirection === 'canada water')) {
+        endpoint.push(CANADA_WATER_C10);
+        console.log('## getBus endpoint 3 - ' + route + ', ' + busDirection);
+      } else if (route === '381' && (busDirection === 'canada water')) {
+        endpoint.push(CANADA_WATER_381);
+        endpoint.push(CANADA_WATER_N381);
+        console.log('## getBus endpoint 4 - ' + route + ', ' + busDirection);
+      }
+
+      if (endpoint.length > 0) {
+        async.map(endpoint, getBusesData, function (err, result) {
+          if (!err) {
+            onAsyncCompleteSuccess(result, response, busDirection);
+          } else {
+            onAsyncCompleteFailed(err, response);
+          }
+        });
+      } else {
+        response.ask("Sorry but I didn't reconize the destination or the route, please try again.");
+        console.log('## getBus - no endpoint');
+      }
+    },
+
+
     getBuses: function (busDirection, response) {
-      var endpoint = [];
+        endpoint.push(LONDON_BRIDGE_C10);
 
       if (busDirection === 'bermondsey' ||
             busDirection === 'london bridge') {
@@ -141,6 +174,15 @@ BusIntent.prototype = (function () {
         response.ask("Sorry but I didn't reconize the destination, please try again.");
         console.log('## getBuses - no endpoint');
       }
+    },
+
+    getRoute: function (intent) {
+      if (intent.slots.Route && intent.slots.Route.value) {
+        console.log('## getRoute - ' + intent.slots.Route.value.toLowerCase());
+        return intent.slots.Route.value.toLowerCase();
+      }
+      console.log('## getRoute - empty string');
+      return null;
     },
 
     getBusDirection: function (intent) {
