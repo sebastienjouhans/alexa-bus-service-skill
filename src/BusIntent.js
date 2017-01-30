@@ -113,8 +113,8 @@ BusIntent.prototype = (function () {
         busDirectionLowercase === 'london bridge')) {
         console.log('## getBuses endpoint 1 - ' + busDirectionLowercase + ', ' + route);
         endpoint.push(LONDON_BRIDGE_C10);
-      } else if (rourouteLowercasete === 'c 10' && busDirectionLowercase === 'canada water') {
-        console.log('## getBuses endpoint 2 - ' + busDirecbusDirectionLowercasetion + ', ' + route);
+      } else if (routeLowercase === 'c 10' && busDirectionLowercase === 'canada water') {
+        console.log('## getBuses endpoint 2 - ' + busDirectionLowercase + ', ' + route);
         endpoint.push(CANADA_WATER_C10);
       } else if (routeLowercase === '381' && (busDirectionLowercase === 'bermondsey' || busDirectionLowercase === 'london bridge')) {
         console.log('## getBuses endpoint 3 - ' + busDirectionLowercase + ', ' + route);
