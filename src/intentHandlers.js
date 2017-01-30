@@ -40,23 +40,26 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
       console.log('## NextBusToIntent route ' + route);
       if (busDirection == null) {
         response.ask("Sorry I didn't reconize the destination, please try again.");
-        console.log('## NextBusToIntent - did not reconize the destination');
+        console.log('## NextBusToIntent - did not reconize the destination busDirection == null');
         return;
       }
       if (route == null) {
         response.ask("Sorry I didn't reconize the route, please try again.");
-        console.log('## NextBusToIntent - did not reconize the destination');
+        console.log('## NextBusToIntent - did not reconize the destination route == null');
         return;
       }
       busIntent.getBus(route, busDirection, response);
     } catch (error) {
+        console.log('## NextBusToIntent - ' + error);
       response.ask("Sorry but I wasn't able to get the bus' timetable at this time, please try again.");
     }
   };
 
   intentHandlers['AMAZON.HelpIntent'] = function (intent, session, response) {
-    let speechOutput = 'You can say for example, when is the next bus to Canada Water. You also can replace Canada Water with another supported directions such as London Bridge, Bermondsey or all. Using all will give buses for all directions.' +
-      'For further commands check out the Alexa on your mobile. I have sent a card with all the possible commands';
+    let speechOutput = 'You can say for example, when is the next bus to Canada Water. You also can ' +
+    'replace Canada Water with another supported directions such as London Bridge, Bermondsey or all.' + 
+    'Using all will give buses for all directions. For further commands check out the Alexa on your mobile.' +
+    'I have also sent a card with all the possible commands. Why don\'t you try one of the commands yourself now?';
     let cardTitle = 'Help';
     let cardContent = '- Alexa ask bus service when is the next bus to Canada Water\n' +
       '- Alexa ask bus service when is the next bus to London Bridge\n' +
