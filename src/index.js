@@ -1,6 +1,6 @@
 'use strict';
 
-var BusService = require('./busService');
+var BusService = require('./BusService');
 
 exports.handler = function (event, context) {
     var busService = new BusService();

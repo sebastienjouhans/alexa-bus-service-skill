@@ -5,7 +5,7 @@ var moment = require('moment-timezone');
 
 var HttpsRequest = require('./HttpsRequest');
 var BusParser = require('./BusDataParser');
-var storage = require('./storage');
+var busServiceStorage = require('./BusServiceStorage');
 
 
 function BusIntent() {
@@ -136,12 +136,12 @@ BusIntent.prototype = (function () {
           } else {
             onAsyncCompleteFailed(err, response);
           }
-          storage.saveData(session.user.userId, intent.name, !err);
+          busServiceStorage.saveData(session.user.userId, intent.name, !err);
         });
       } else {
         response.ask("Sorry but I didn't reconize the destination or the bus number, please try again.");
         console.log('## getBus - no endpoint');
-        storage.saveData(session.user.userId, intent.name, false);
+        busServiceStorage.saveData(session.user.userId, intent.name, false);
       }
     },
 
@@ -180,12 +180,12 @@ BusIntent.prototype = (function () {
           } else {
             onAsyncCompleteFailed(err, response);
           }
-          storage.saveData(session.user.userId, intent.name, !err);
+          busServiceStorage.saveData(session.user.userId, intent.name, !err);
         });
       } else {
         response.ask("Sorry but I didn't reconize the destination, please try again.");
         console.log('## getBuses - no endpoint');
-        storage.saveData(session.user.userId, intent.name, false);
+        busServiceStorage.saveData(session.user.userId, intent.name, false);
       }
     },
 
