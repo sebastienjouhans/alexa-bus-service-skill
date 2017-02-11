@@ -65,7 +65,7 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
 
   intentHandlers['AMAZON.HelpIntent'] = function (intent, session, response) {
     let speechOutput = 'You can say for example, when is the next bus to Canada Water. You also can ' +
-      'replace Canada Water with another supported directions such as London Bridge, Bermondsey or all.' +
+      'replace Canada Water with another supported directions such as London Bridge, Bermondsey or all. ' +
       'Using all will give buses for all directions. For further commands check out the Alexa app on your mobile. ' +
       'I have sent a card with  the list of all available commands. Why don\'t you try one of the commands yourself now?';
     let reprompt = 'Have look at the Alexa app for a list of all avalaible commands.';
