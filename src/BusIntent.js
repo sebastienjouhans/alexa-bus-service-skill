@@ -2,11 +2,10 @@
 
 var async = require('async');
 var moment = require('moment-timezone');
-const uuid = require('node-uuid');
 
 var HttpsRequest = require('./HttpsRequest');
 var BusParser = require('./BusDataParser');
-var Storage = require('./Storage');
+var storage = require('./storage');
 
 
 function BusIntent() {
@@ -104,6 +103,8 @@ BusIntent.prototype = (function () {
       });
   };
 
+
+
   return {
     getBus: function (intent, session, response, route, busDirection) {
       var endpoint = [];
@@ -135,12 +136,12 @@ BusIntent.prototype = (function () {
           } else {
             onAsyncCompleteFailed(err, response);
           }
-          saveData(session.user.userId, intent.name, !err);
+          storage.saveData(session.user.userId, intent.name, !err);
         });
       } else {
         response.ask("Sorry but I didn't reconize the destination or the bus number, please try again.");
         console.log('## getBus - no endpoint');
-        saveData(session.user.userId, intent.name, false);
+        storage.saveData(session.user.userId, intent.name, false);
       }
     },
 
@@ -179,12 +180,12 @@ BusIntent.prototype = (function () {
           } else {
             onAsyncCompleteFailed(err, response);
           }
-          saveData(session.user.userId, intent.name, !err);
+          storage.saveData(session.user.userId, intent.name, !err);
         });
       } else {
         response.ask("Sorry but I didn't reconize the destination, please try again.");
         console.log('## getBuses - no endpoint');
-        saveData(session.user.userId, intent.name, false);
+        storage.saveData(session.user.userId, intent.name, false);
       }
     },
 

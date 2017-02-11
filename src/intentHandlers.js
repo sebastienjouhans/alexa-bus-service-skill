@@ -1,6 +1,7 @@
 'use strict';
 
 var BusIntent = require('./BusIntent');
+var storage = require('./storage');
 
 
 var registerIntentHandlers = function (intentHandlers, skillContext) {
@@ -11,14 +12,14 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
       console.log('## NextBusesToIntent ' + busDirection);
       if (busDirection == null) {
         response.ask("Sorry I didn't reconize the destination, please try again.");
-        saveData(session.user.userId, intent.name, false);
+        storage.saveData(session.user.userId, intent.name, false);
         console.log('## NextBusesToIntent - did not reconize the destination');
         return;
       }
       busIntent.getBuses(intent, session, response, busDirection);
     } catch (error) {
       response.ask("Sorry but I wasn't able to get the bus' timetable at this time, please try again.");
-      saveData(session.user.userId, intent.name, false);
+      storage.saveData(session.user.userId, intent.name, false);
       console.log('error ' + error);
     }
   };
@@ -30,7 +31,7 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
       busIntent.getBuses(intent, session, response, 'all');
     } catch (error) {
       response.ask("Sorry but I wasn't able to get the bus' timetable at this time, please try again.");
-      saveData(session.user.userId, intent.name, false);
+      storage.saveData(session.user.userId, intent.name, false);
       console.log('error ' + error);
     }
   };
@@ -44,20 +45,20 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
       console.log('## NextBusToIntent route ' + route);
       if (busDirection == null) {
         response.ask("Sorry I didn't reconize the destination, please try again.");
-        saveData(session.user.userId, intent.name, false);
+        storage.saveData(session.user.userId, intent.name, false);
         console.log('## NextBusToIntent - did not reconize the destination busDirection == null');
         return;
       }
       if (route == null) {
         response.ask("Sorry I didn't reconize the route, please try again.");
-        saveData(session.user.userId, intent.name, false);
+        storage.saveData(session.user.userId, intent.name, false);
         console.log('## NextBusToIntent - did not reconize the destination route == null');
         return;
       }
       busIntent.getBus(intent, session, response, route, busDirection);
     } catch (error) {
       response.ask("Sorry but I wasn't able to get the bus' timetable at this time, please try again.");
-      saveData(session.user.userId, intent.name, false);
+      storage.saveData(session.user.userId, intent.name, false);
       console.log('## NextBusToIntent - ' + error);
     }
   };
@@ -81,7 +82,7 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
       reprompt,
       cardTitle,
       cardContent);
-    saveData(session.user.userId, intent.name, true);
+    storage.saveData(session.user.userId, intent.name, true);
   };
 
   intentHandlers['AMAZON.CancelIntent'] = function (intent, session, response) {
