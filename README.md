@@ -1,4 +1,4 @@
-# alexa-bus-service-skill
+# Alexa bus service skill
 
 This skill provides when the nearest buses will be getting to the bus stops near se16 5eq in london.
 
