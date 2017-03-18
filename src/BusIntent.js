@@ -44,7 +44,7 @@ BusIntent.prototype = (function () {
         cantFindBuseTimetableResponse(alexa);
         console.log('## no buses from request ' + busDirection);
       } else {
-        let alexaResponse = getAlexaResponse(buses, busDirection, route);
+        let alexaResponse = getAlexaResponse(alexa, buses, busDirection, route);
         alexa.attributes['speechOutput'] = alexaResponse.message;
         alexa.attributes['repromptSpeech'] = '';
         alexa.emit(':tellWithCard', alexa.attributes['speechOutput'], alexaResponse.cardTtitle, alexaResponse.cardContent, null);
@@ -56,15 +56,14 @@ BusIntent.prototype = (function () {
   };
 
   var cantFindBuseTimetableResponse = function (alexa) {
-    alexa.attributes['speechOutput'] = 'Sorry but I wasn\'t able to get the bus\' timetable at this time, please try again.';
-    alexa.attributes['repromptSpeech'] = 'You can say for example, when is the next bus to Canada Water or London Bridge.';
+    alexa.attributes['speechOutput'] = alexa.t('ERROR_NO_DESTINATION');
+    alexa.attributes['repromptSpeech'] = alexa.t('ERROR_REPROMPT');
     alexa.emit(':ask', alexa.attributes['speechOutput'], alexa.attributes['repromptSpeech']);
     console.log("## NextBusToIntent - can't find timetable");
   };
 
-  var getAlexaResponse = function (buses, busDirection, route) {
+  var getAlexaResponse = function (alexa, buses, busDirection, route) {
     let isAllDirection = busDirection === 'all' || busDirection === 'everywhere' || busDirection === 'anywhere';
-
     let directionTitle = isAllDirection ? 'Canada Water and London Bridge' : busDirection;
     let title = route == null ? 'Buses to ' + directionTitle : route + ' to ' + directionTitle;
     let message = title + ', ';
@@ -72,9 +71,9 @@ BusIntent.prototype = (function () {
     let totalBuses = isAllDirection ? 3 : 2;
 
     for (var i = 0; i < buses.length; i++) {
-      message += buses[i].lineName + ' towards ' + buses[i].direction + ' expected in ' + buses[i].minutes + ' minutes and ' + buses[i].seconds + ' seconds, ';
+      message += alexa.t('BUS_MESSAGE', buses[i].lineName, buses[i].direction, buses[i].minutes, buses[i].seconds);
       let direction = (isAllDirection ? ' to ' + buses[i].direction : '');
-      cardContent += '- ' + buses[i].lineName + direction + ' in ' + buses[i].minutes + ' mins and ' + buses[i].seconds + ' secs\n';
+      cardContent += alexa.t('BUS_CARD', buses[i].lineName, direction, buses[i].minutes, buses[i].seconds);
       if (i === totalBuses) {
         break;
       }
@@ -138,8 +137,8 @@ BusIntent.prototype = (function () {
           busServiceStorage.saveData(alexa.event.session.user.userId, alexa.event.request.intent.name, !err);
         });
       } else {
-        alexa.attributes['speechOutput'] = 'Sorry but I didn\'t reconize the destination or the bus number, please try again.';
-        alexa.attributes['repromptSpeech'] = 'You can say for example, when is the next bus to Canada Water or London Bridge.';
+        alexa.attributes['speechOutput'] = alexa.t('ERROR_NO_DESTINATION');
+        alexa.attributes['repromptSpeech'] = alexa.t('ERROR_REPROMPT');
         alexa.emit(':ask', alexa.attributes['speechOutput'], alexa.attributes['repromptSpeech']);
         
         console.log('## getBus - no endpoint');
@@ -185,8 +184,8 @@ BusIntent.prototype = (function () {
           busServiceStorage.saveData(alexa.event.session.user.userId, alexa.event.request.intent.name, !err);
         });
       } else {
-        alexa.attributes['speechOutput'] = 'Sorry but I didn\'t reconize the destination, please try again.';
-        alexa.attributes['repromptSpeech'] = 'You can say for example, when is the next bus to Canada Water or London Bridge.';
+        alexa.attributes['speechOutput'] = alexa.t('ERROR_NO_DESTINATION');
+        alexa.attributes['repromptSpeech'] = alexa.t('ERROR_REPROMPT');
         alexa.emit(':ask', alexa.attributes['speechOutput'], alexa.attributes['repromptSpeech']);        
         console.log('## getBuses - no endpoint');
         busServiceStorage.saveData(alexa.event.session.user.userId, alexa.event.request.intent.name, false);
