@@ -16,8 +16,6 @@ exports.handler = function (event, context, callback) {
 };
 
 var handlers = {
-    //Use LaunchRequest, instead of NewSession if you want to use the one-shot model
-    // Alexa, ask [my-skill-invocation-name] to (do something)...
     'LaunchRequest': function () {
         this.attributes['speechOutput'] = 'Welcome to the bus service skill. You can say for example, when is the next bus to Canada Water or London Bridge. Why don\'t you try it yourself now?';
         this.attributes['repromptSpeech'] = 'For instructions on what you can say, simply say help me.';
@@ -116,9 +114,7 @@ var handlers = {
             '- Alexa ask bus service when is the next c10 to Canada Water\n';
 
         this.emit(':askWithCard', this.attributes['speechOutput'], this.attributes['repromptSpeech'], cardTitle, cardContent, null);
-
         busServiceStorage.saveData(this.event.session.user.userId, this.event.request.intent.name, true);
-
     },
      'AMAZON.RepeatIntent': function () {
          this.emit(':ask', this.attributes['speechOutput'], this.attributes['repromptSpeech'])

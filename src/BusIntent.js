@@ -188,8 +188,7 @@ BusIntent.prototype = (function () {
       } else {
         alexa.attributes['speechOutput'] = "Sorry but I didn't reconize the destination, please try again.";
         alexa.attributes['repromptSpeech'] = 'You can say for example, when is the next bus to Canada Water or London Bridge.';
-        alexa.emit(':ask', alexa.attributes['speechOutput'], alexa.attributes['repromptSpeech']);
-        
+        alexa.emit(':ask', alexa.attributes['speechOutput'], alexa.attributes['repromptSpeech']);        
         console.log('## getBuses - no endpoint');
         busServiceStorage.saveData(alexa.event.session.user.userId, alexa.event.request.intent.name, false);
       }
