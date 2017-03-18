@@ -5,8 +5,7 @@ var moment = require('moment-timezone');
 
 var HttpsRequest = require('./HttpsRequest');
 var BusParser = require('./BusDataParser');
-var busServiceStorage = require('./BusServiceStorage');
-
+var busServiceStorage = require('./busServiceStorage');
 
 function BusIntent() {
 }

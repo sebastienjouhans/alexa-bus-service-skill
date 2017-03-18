@@ -3,25 +3,26 @@
 var Alexa = require('alexa-sdk');
 
 var BusIntent = require('./BusIntent');
-var busServiceStorage = require('./BusServiceStorage');
+var busServiceStorage = require('./busServiceStorage');
+var languageStrings = require('./languageStrings');
 
 var APP_ID = 'amzn1.ask.skill.05fd8b53-71ed-424c-a10e-f14879d37f0b';//amzn1.ask.skill.7e868583-eaf8-4be0-afdb-251b4858e4cf';
 
 exports.handler = function (event, context, callback) {
     var alexa = Alexa.handler(event, context);
     alexa.APP_ID = APP_ID;
-    //alexa.resources = languageStrings;
+    alexa.resources = languageStrings;
     alexa.registerHandlers(handlers);
     alexa.execute();
 };
 
 var handlers = {
     'LaunchRequest': function () {
-        this.attributes['speechOutput'] = 'Welcome to the bus service skill. You can say for example, when is the next bus to Canada Water or London Bridge. Why don\'t you try it yourself now?';
-        this.attributes['repromptSpeech'] = 'For instructions on what you can say, simply say help me.';
+        this.attributes['speechOutput'] = this.t('WELCOME_MESSAGE', this.t('SKILL_NAME'));
+        this.attributes['repromptSpeech'] = this.t('WELCOME_REPROMPT');
         this.emit(':ask', this.attributes['speechOutput'], this.attributes['repromptSpeech']);
     },
-    
+
     'NextBusesToIntent': function () {
 
         try {
@@ -113,12 +114,12 @@ var handlers = {
         this.emit(':askWithCard', this.attributes['speechOutput'], this.attributes['repromptSpeech'], cardTitle, cardContent, null);
         busServiceStorage.saveData(this.event.session.user.userId, this.event.request.intent.name, true);
     },
-    'Unhandled': function() {
+    'Unhandled': function () {
         this.emit(':ask', 'Sorry, I didn\'t get that. Try again', 'Try again.');
     },
-     'AMAZON.RepeatIntent': function () {
-         this.emit(':ask', this.attributes['speechOutput'], this.attributes['repromptSpeech'])
-     },
+    'AMAZON.RepeatIntent': function () {
+        this.emit(':ask', this.attributes['speechOutput'], this.attributes['repromptSpeech'])
+    },
     'AMAZON.StopIntent': function () {
         this.emit('SessionEndedRequest');
     },
@@ -126,6 +127,6 @@ var handlers = {
         this.emit('SessionEndedRequest');
     },
     'SessionEndedRequest': function () {
-        this.emit(':tell', 'Goodbye!');
+        this.emit(':tell', this.t('STOP_MESSAGE'));
     }
 };
