@@ -5,7 +5,7 @@ var Alexa = require('alexa-sdk');
 var BusIntent = require('./BusIntent');
 var busServiceStorage = require('./BusServiceStorage');
 
-var APP_ID = 'amzn1.ask.skill.7e868583-eaf8-4be0-afdb-251b4858e4cf';
+var APP_ID = 'amzn1.ask.skill.05fd8b53-71ed-424c-a10e-f14879d37f0b';//amzn1.ask.skill.7e868583-eaf8-4be0-afdb-251b4858e4cf';
 
 exports.handler = function (event, context, callback) {
     var alexa = Alexa.handler(event, context);
