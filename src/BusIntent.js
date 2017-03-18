@@ -48,8 +48,7 @@ BusIntent.prototype = (function () {
         let alexaResponse = getAlexaResponse(buses, busDirection, route);
         alexa.attributes['speechOutput'] = alexaResponse.message;
         alexa.attributes['repromptSpeech'] = '';
-        alexa.emit(':tellWithCard', this.attributes['speechOutput'], alexaResponse.cardTtitle, alexaResponse.cardContent, null);
-
+        alexa.emit(':tellWithCard', alexa.attributes['speechOutput'], alexaResponse.cardTtitle, alexaResponse.cardContent, null);
         console.log('## 6 bus requests success ' + busDirection);
       }
     } else {
@@ -68,7 +67,7 @@ BusIntent.prototype = (function () {
     let isAllDirection = busDirection === 'all' || busDirection === 'everywhere' || busDirection === 'anywhere';
 
     let directionTitle = isAllDirection ? 'Canada Water and London Bridge' : busDirection;
-    let cardTtitle = route == null ? 'Buses to ' + directionTitle : route + ' to ' + directionTitle;
+    let title = route == null ? 'Buses to ' + directionTitle : route + ' to ' + directionTitle;
     let message = title + ', ';
     let cardContent = moment().tz('Europe/London').format('HH:mm:ss') + '\n';
     let totalBuses = isAllDirection ? 3 : 2;
@@ -81,7 +80,7 @@ BusIntent.prototype = (function () {
         break;
       }
     }
-    return { message: message, cardContent: cardContent, cardTtitle: cardTtitle };
+    return { message: message, cardContent: cardContent, cardTtitle: title };
   };
 
   var removeCloseBuses = function (buses) {
@@ -137,7 +136,7 @@ BusIntent.prototype = (function () {
           } else {
             onAsyncCompleteFailed(err, alexa);
           }
-          busServiceStorage.saveData(alexa.event.session.user.userId, alexa.event.intent.name, !err);
+          busServiceStorage.saveData(alexa.event.session.user.userId, alexa.event.request.intent.name, !err);
         });
       } else {
         alexa.attributes['speechOutput'] = "Sorry but I didn't reconize the destination or the bus number, please try again.";
@@ -145,7 +144,7 @@ BusIntent.prototype = (function () {
         alexa.emit(':ask', alexa.attributes['speechOutput'], alexa.attributes['repromptSpeech']);
         
         console.log('## getBus - no endpoint');
-        busServiceStorage.saveData(alexa.event.session.user.userId, alexa.event.intent.name, false);
+        busServiceStorage.saveData(alexa.event.session.user.userId, alexa.event.request.intent.name, false);
       }
     },
 
@@ -184,7 +183,7 @@ BusIntent.prototype = (function () {
           } else {
             onAsyncCompleteFailed(err, alexa);
           }
-          busServiceStorage.saveData(alexa.event.session.user.userId, alexa.event.intent.name, !err);
+          busServiceStorage.saveData(alexa.event.session.user.userId, alexa.event.request.intent.name, !err);
         });
       } else {
         alexa.attributes['speechOutput'] = "Sorry but I didn't reconize the destination, please try again.";
@@ -192,7 +191,7 @@ BusIntent.prototype = (function () {
         alexa.emit(':ask', alexa.attributes['speechOutput'], alexa.attributes['repromptSpeech']);
         
         console.log('## getBuses - no endpoint');
-        busServiceStorage.saveData(alexa.event.session.user.userId, alexa.event.intent.name, false);
+        busServiceStorage.saveData(alexa.event.session.user.userId, alexa.event.request.intent.name, false);
       }
     },
 
@@ -212,7 +211,7 @@ BusIntent.prototype = (function () {
     },
 
     getBusDirection: function (intent) {
-      var itemSlot = intent.slots.Route;
+      var itemSlot = intent.slots.BusDirection;
       var itemName;
       if (itemSlot && itemSlot.value) {
         itemName = itemSlot.value.toLowerCase();

@@ -5,7 +5,7 @@ var Alexa = require('alexa-sdk');
 var BusIntent = require('./BusIntent');
 var busServiceStorage = require('./BusServiceStorage');
 
-var APP_ID = 'amzn1.ask.skill.05fd8b53-71ed-424c-a10e-f14879d37f0b';//'amzn1.ask.skill.7e868583-eaf8-4be0-afdb-251b4858e4cf';
+var APP_ID = 'amzn1.ask.skill.7e868583-eaf8-4be0-afdb-251b4858e4cf';
 
 exports.handler = function (event, context, callback) {
     var alexa = Alexa.handler(event, context);
@@ -16,8 +16,6 @@ exports.handler = function (event, context, callback) {
 };
 
 var handlers = {
-    //Use LaunchRequest, instead of NewSession if you want to use the one-shot model
-    // Alexa, ask [my-skill-invocation-name] to (do something)...
     'LaunchRequest': function () {
         this.attributes['speechOutput'] = 'Welcome to the bus service skill. You can say for example, when is the next bus to Canada Water or London Bridge. Why don\'t you try it yourself now?';
         this.attributes['repromptSpeech'] = 'For instructions on what you can say, simply say help me.';
@@ -67,7 +65,7 @@ var handlers = {
         try {
             let busIntent = new BusIntent();
             let busDirection = busIntent.getBusDirection(this.event.request.intent);
-            let route = busIntent.getRoute(this.event.request.intent));
+            let route = busIntent.getRoute(this.event.request.intent);
             console.log('## NextBusToIntent busDirection ' + busDirection);
             console.log('## NextBusToIntent route ' + route);
             if (busDirection == null) {
@@ -101,7 +99,7 @@ var handlers = {
         try {
             let busIntent = new BusIntent();
             let busDirection = busIntent.getBusDirection(this.event.request.intent);
-            let route = busIntent.getRoute(this.event.request.intent));
+            let route = busIntent.getRoute(this.event.request.intent);
             console.log('## NextBusToIntent busDirection ' + busDirection);
             console.log('## NextBusToIntent route ' + route);
             if (busDirection == null) {
@@ -152,9 +150,9 @@ var handlers = {
         busServiceStorage.saveData(this.event.session.user.userId, this.event.request.intent.name, true);
 
     },
-     'AMAZON.RepeatIntent': function () {
-         this.emit(':ask', this.attributes['speechOutput'], this.attributes['repromptSpeech'])
-     },
+    'AMAZON.RepeatIntent': function () {
+        this.emit(':ask', this.attributes['speechOutput'], this.attributes['repromptSpeech'])
+    },
     'AMAZON.StopIntent': function () {
         this.emit('SessionEndedRequest');
     },
