@@ -57,7 +57,7 @@ BusIntent.prototype = (function () {
   };
 
   var cantFindBuseTimetableResponse = function (alexa) {
-    alexa.attributes['speechOutput'] = "Sorry but I wasn't able to get the bus' timetable at this time, please try again.";
+    alexa.attributes['speechOutput'] = 'Sorry but I wasn\'t able to get the bus\' timetable at this time, please try again.';
     alexa.attributes['repromptSpeech'] = 'You can say for example, when is the next bus to Canada Water or London Bridge.';
     alexa.emit(':ask', alexa.attributes['speechOutput'], alexa.attributes['repromptSpeech']);
     console.log("## NextBusToIntent - can't find timetable");
@@ -139,7 +139,7 @@ BusIntent.prototype = (function () {
           busServiceStorage.saveData(alexa.event.session.user.userId, alexa.event.request.intent.name, !err);
         });
       } else {
-        alexa.attributes['speechOutput'] = "Sorry but I didn't reconize the destination or the bus number, please try again.";
+        alexa.attributes['speechOutput'] = 'Sorry but I didn\'t reconize the destination or the bus number, please try again.';
         alexa.attributes['repromptSpeech'] = 'You can say for example, when is the next bus to Canada Water or London Bridge.';
         alexa.emit(':ask', alexa.attributes['speechOutput'], alexa.attributes['repromptSpeech']);
         
@@ -186,7 +186,7 @@ BusIntent.prototype = (function () {
           busServiceStorage.saveData(alexa.event.session.user.userId, alexa.event.request.intent.name, !err);
         });
       } else {
-        alexa.attributes['speechOutput'] = "Sorry but I didn't reconize the destination, please try again.";
+        alexa.attributes['speechOutput'] = 'Sorry but I didn\'t reconize the destination, please try again.';
         alexa.attributes['repromptSpeech'] = 'You can say for example, when is the next bus to Canada Water or London Bridge.';
         alexa.emit(':ask', alexa.attributes['speechOutput'], alexa.attributes['repromptSpeech']);        
         console.log('## getBuses - no endpoint');

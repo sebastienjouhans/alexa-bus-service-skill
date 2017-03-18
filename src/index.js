@@ -29,7 +29,7 @@ var handlers = {
             let busDirection = busIntent.getBusDirection(this.event.request.intent);
             console.log('## NextBusesToIntent ' + busDirection);
             if (busDirection == null) {
-                this.attributes['speechOutput'] = "Sorry I didn't reconize the destination, please try again., please try again.";
+                this.attributes['speechOutput'] = 'Sorry I didn\'t reconize the destination, please try again., please try again.';
                 this.attributes['repromptSpeech'] = 'You can say for example, when is the next bus to Canada Water or London Bridge.';
                 this.emit(':ask', this.attributes['speechOutput'], this.attributes['repromptSpeech']);
                 busServiceStorage.saveData(this.event.session.user.userId, this.event.request.intent.name, false);
@@ -38,7 +38,7 @@ var handlers = {
             }
             busIntent.getBuses(this, busDirection);
         } catch (error) {
-            this.attributes['speechOutput'] = "Sorry but I wasn't able to get the bus' timetable at this time, please try again.";
+            this.attributes['speechOutput'] = 'Sorry but I wasn\t able to get the bus\' timetable at this time, please try again.';
             this.attributes['repromptSpeech'] = 'You can say for example, when is the next bus to Canada Water or London Bridge.';
             this.emit(':ask', this.attributes['speechOutput'], this.attributes['repromptSpeech']);
             busServiceStorage.saveData(this.event.session.user.userId, this.event.request.intent.name, false);
@@ -53,7 +53,7 @@ var handlers = {
             let busIntent = new BusIntent();
             busIntent.getBuses(this, 'all');
         } catch (error) {
-            this.attributes['speechOutput'] = "Sorry but I wasn't able to get the bus' timetable at this time, please try again.";
+            this.attributes['speechOutput'] = 'Sorry but I wasn\'t able to get the bus\' timetable at this time, please try again.';
             this.attributes['repromptSpeech'] = 'You can say for example, when is the next bus to Canada Water or London Bridge.';
             this.emit(':ask', this.attributes['speechOutput'], this.attributes['repromptSpeech']);
             busServiceStorage.saveData(this.event.session.user.userId, this.event.request.intent.name, false);
@@ -69,7 +69,7 @@ var handlers = {
             console.log('## NextBusToIntent busDirection ' + busDirection);
             console.log('## NextBusToIntent route ' + route);
             if (busDirection == null) {
-                this.attributes['speechOutput'] = "Sorry I didn't reconize the destination, please try again.";
+                this.attributes['speechOutput'] = 'Sorry I didn\'t reconize the destination, please try again.';
                 this.attributes['repromptSpeech'] = 'You can say for example, when is the next bus to Canada Water or London Bridge.';
                 this.emit(':ask', this.attributes['speechOutput'], this.attributes['repromptSpeech']);
                 busServiceStorage.saveData(this.event.session.user.userId, this.event.request.intent.name, false);
@@ -77,7 +77,7 @@ var handlers = {
                 return;
             }
             if (route == null) {
-                this.attributes['speechOutput'] = "Sorry I didn't reconize the route, please try again.";
+                this.attributes['speechOutput'] = 'Sorry I didn\'t reconize the route, please try again.';
                 this.attributes['repromptSpeech'] = 'You can say for example, when is the next bus to Canada Water or London Bridge.';
                 this.emit(':ask', this.attributes['speechOutput'], this.attributes['repromptSpeech']);
                 busServiceStorage.saveData(this.event.session.user.userId, this.event.request.intent.name, false);
@@ -86,7 +86,7 @@ var handlers = {
             }
             busIntent.getBus(this, route, busDirection);
         } catch (error) {
-            this.attributes['speechOutput'] = "Sorry but I wasn't able to get the bus' timetable at this time, please try again.";
+            this.attributes['speechOutput'] = 'Sorry but I wasn\'t able to get the bus\' timetable at this time, please try again.';
             this.attributes['repromptSpeech'] = 'You can say for example, when is the next bus to Canada Water or London Bridge.';
             this.emit(':ask', this.attributes['speechOutput'], this.attributes['repromptSpeech']);
             busServiceStorage.saveData(this.event.session.user.userId, this.event.request.intent.name, false);
@@ -95,7 +95,6 @@ var handlers = {
     },
 
     'AMAZON.HelpIntent': function () {
-
         this.attributes['speechOutput'] = 'You can say for example, when is the next bus to Canada Water. You also can ' +
             'replace Canada Water with another supported directions such as London Bridge, Bermondsey or all. ' +
             'Using all will give buses for all directions. For further commands check out the Alexa app on your mobile. ' +
@@ -114,6 +113,9 @@ var handlers = {
         this.emit(':askWithCard', this.attributes['speechOutput'], this.attributes['repromptSpeech'], cardTitle, cardContent, null);
         busServiceStorage.saveData(this.event.session.user.userId, this.event.request.intent.name, true);
     },
+    'Unhandled': function() {
+        this.emit(':ask', 'Sorry, I didn\'t get that. Try again', 'Try again.');
+    },
      'AMAZON.RepeatIntent': function () {
          this.emit(':ask', this.attributes['speechOutput'], this.attributes['repromptSpeech'])
      },
@@ -124,6 +126,6 @@ var handlers = {
         this.emit('SessionEndedRequest');
     },
     'SessionEndedRequest': function () {
-        this.emit(':tell', "Goodbye!");
+        this.emit(':tell', 'Goodbye!');
     }
 };
