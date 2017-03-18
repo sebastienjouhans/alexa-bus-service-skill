@@ -61,7 +61,6 @@ var handlers = {
         }
     },
 
-
     'NextBusToIntent': function () {
         try {
             let busIntent = new BusIntent();
@@ -94,7 +93,6 @@ var handlers = {
             console.log('## NextBusToIntent - ' + error);
         }
     },
-
 
     'AMAZON.HelpIntent': function () {
 
