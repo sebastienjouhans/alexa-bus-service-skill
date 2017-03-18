@@ -19,12 +19,12 @@ BusIntent.prototype = (function () {
   const CANADA_WATER_381 = 'https://api.tfl.gov.uk/Line/381/Arrivals?stopPointId=490006186S&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266';
   const CANADA_WATER_N381 = 'https://api.tfl.gov.uk/Line/n381/Arrivals?stopPointId=490006186S&app_id=8105f5d7&app_key=687691bd1523d7c4c2f56ed249b21266';
 
-  var onAsyncCompleteFailed = function (err, response) {
+  var onAsyncCompleteFailed = function (err, alexa) {
     console.log(err);
-    cantFindBuseTimetableResponse(response);
+    cantFindBuseTimetableResponse(alexa);
   };
 
-  var onAsyncCompleteSuccess = function (results, response, busDirection, route) {
+  var onAsyncCompleteSuccess = function (results, alexa, busDirection, route) {
     if (results) {
       var buses = [];
       for (var i = 0; i < results.length; i++) {
@@ -42,24 +42,25 @@ BusIntent.prototype = (function () {
       buses = removeCloseBuses(buses);
 
       if (buses.length === 0) {
-        cantFindBuseTimetableResponse(response);
+        cantFindBuseTimetableResponse(alexa);
         console.log('## no buses from request ' + busDirection);
       } else {
         let alexaResponse = getAlexaResponse(buses, busDirection, route);
-
-        response.tellWithCard(alexaResponse.message,
-          alexaResponse.title,
-          alexaResponse.cardContent);
+        alexa.attributes['speechOutput'] = alexaResponse.message;
+        alexa.attributes['repromptSpeech'] = '';
+        alexa.emit(':tellWithCard', this.attributes['speechOutput'], alexaResponse.cardTtitle, alexaResponse.cardContent, null);
 
         console.log('## 6 bus requests success ' + busDirection);
       }
     } else {
-      cantFindBuseTimetableResponse(response);
+      cantFindBuseTimetableResponse(alexa);
     }
   };
 
-  var cantFindBuseTimetableResponse = function (response) {
-    response.ask("Sorry but I wasn't able to get the bus' timetable at this time, please try again.");
+  var cantFindBuseTimetableResponse = function (alexa) {
+    alexa.attributes['speechOutput'] = "Sorry but I wasn't able to get the bus' timetable at this time, please try again.";
+    alexa.attributes['repromptSpeech'] = 'You can say for example, when is the next bus to Canada Water or London Bridge.';
+    alexa.emit(':ask', alexa.attributes['speechOutput'], alexa.attributes['repromptSpeech']);
     console.log("## NextBusToIntent - can't find timetable");
   };
 
@@ -67,7 +68,7 @@ BusIntent.prototype = (function () {
     let isAllDirection = busDirection === 'all' || busDirection === 'everywhere' || busDirection === 'anywhere';
 
     let directionTitle = isAllDirection ? 'Canada Water and London Bridge' : busDirection;
-    let title = route == null ? 'Buses to ' + directionTitle : route + ' to ' + directionTitle;
+    let cardTtitle = route == null ? 'Buses to ' + directionTitle : route + ' to ' + directionTitle;
     let message = title + ', ';
     let cardContent = moment().tz('Europe/London').format('HH:mm:ss') + '\n';
     let totalBuses = isAllDirection ? 3 : 2;
@@ -80,7 +81,7 @@ BusIntent.prototype = (function () {
         break;
       }
     }
-    return { message: message, cardContent: cardContent, title: title };
+    return { message: message, cardContent: cardContent, cardTtitle: cardTtitle };
   };
 
   var removeCloseBuses = function (buses) {
@@ -106,7 +107,7 @@ BusIntent.prototype = (function () {
 
 
   return {
-    getBus: function (intent, session, response, route, busDirection) {
+    getBus: function (alexa, route, busDirection) {
       var endpoint = [];
 
       let busDirectionLowercase = busDirection.toLowerCase();
@@ -132,20 +133,23 @@ BusIntent.prototype = (function () {
       if (endpoint.length > 0) {
         async.map(endpoint, getBusesData, function (err, result) {
           if (!err) {
-            onAsyncCompleteSuccess(result, response, busDirection, route);
+            onAsyncCompleteSuccess(result, alexa, busDirection, route);
           } else {
-            onAsyncCompleteFailed(err, response);
+            onAsyncCompleteFailed(err, alexa);
           }
-          busServiceStorage.saveData(session.user.userId, intent.name, !err);
+          busServiceStorage.saveData(alexa.event.session.user.userId, alexa.event.intent.name, !err);
         });
       } else {
-        response.ask("Sorry but I didn't reconize the destination or the bus number, please try again.");
+        alexa.attributes['speechOutput'] = "Sorry but I didn't reconize the destination or the bus number, please try again.";
+        alexa.attributes['repromptSpeech'] = 'You can say for example, when is the next bus to Canada Water or London Bridge.';
+        alexa.emit(':ask', alexa.attributes['speechOutput'], alexa.attributes['repromptSpeech']);
+        
         console.log('## getBus - no endpoint');
-        busServiceStorage.saveData(session.user.userId, intent.name, false);
+        busServiceStorage.saveData(alexa.event.session.user.userId, alexa.event.intent.name, false);
       }
     },
 
-    getBuses: function (intent, session, response, busDirection) {
+    getBuses: function (alexa, busDirection) {
       var endpoint = [];
 
       let busDirectionLowercase = busDirection.toLowerCase();
@@ -176,32 +180,47 @@ BusIntent.prototype = (function () {
       if (endpoint.length > 0) {
         async.map(endpoint, getBusesData, function (err, result) {
           if (!err) {
-            onAsyncCompleteSuccess(result, response, busDirection);
+            onAsyncCompleteSuccess(result, alexa, busDirection);
           } else {
-            onAsyncCompleteFailed(err, response);
+            onAsyncCompleteFailed(err, alexa);
           }
-          busServiceStorage.saveData(session.user.userId, intent.name, !err);
+          busServiceStorage.saveData(alexa.event.session.user.userId, alexa.event.intent.name, !err);
         });
       } else {
-        response.ask("Sorry but I didn't reconize the destination, please try again.");
+        alexa.attributes['speechOutput'] = "Sorry but I didn't reconize the destination, please try again.";
+        alexa.attributes['repromptSpeech'] = 'You can say for example, when is the next bus to Canada Water or London Bridge.';
+        alexa.emit(':ask', alexa.attributes['speechOutput'], alexa.attributes['repromptSpeech']);
+        
         console.log('## getBuses - no endpoint');
-        busServiceStorage.saveData(session.user.userId, intent.name, false);
+        busServiceStorage.saveData(alexa.event.session.user.userId, alexa.event.intent.name, false);
       }
     },
 
     getRoute: function (intent) {
-      if (intent.slots.Route && intent.slots.Route.value) {
-        console.log('## getRoute - ' + intent.slots.Route.value);
-        return intent.slots.Route.value;
+      var itemSlot = intent.slots.Route;
+      var itemName;
+      if (itemSlot && itemSlot.value) {
+        itemName = itemSlot.value.toLowerCase();
+      }
+
+      if (itemName) {
+        console.log('## getRoute - ' + itemName);
+        return itemName;
       }
       console.log('## getRoute - empty string');
       return null;
     },
 
     getBusDirection: function (intent) {
-      if (intent.slots.BusDirection && intent.slots.BusDirection.value) {
-        console.log('## getBusDirection - ' + intent.slots.BusDirection.value);
-        return intent.slots.BusDirection.value;
+      var itemSlot = intent.slots.Route;
+      var itemName;
+      if (itemSlot && itemSlot.value) {
+        itemName = itemSlot.value.toLowerCase();
+      }
+
+      if (itemName) {
+        console.log('## getBusDirection - ' + itemName);
+        return itemName;
       }
       console.log('## getBusDirection - empty string');
       return null;
