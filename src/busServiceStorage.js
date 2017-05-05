@@ -2,7 +2,7 @@
 
 var Storage = require('./Storage');
 var moment = require('moment-timezone');
-const uuid = require('node-uuid');
+const uuid = require('uuid');
 
 var BusServiceStorage = function () {
     Storage.call(this);
