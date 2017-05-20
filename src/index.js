@@ -1,6 +1,7 @@
 'use strict';
 
 var Alexa = require('alexa-sdk');
+var dashbot = require('dashbot')(process.env.DASHBOT_API_KEY).alexa;
 
 var BusIntent = require('./BusIntent');
 var busServiceStorage = require('./busServiceStorage');
@@ -8,7 +9,7 @@ var languageStrings = require('./languageStrings');
 
 var APP_ID = 'amzn1.ask.skill.05fd8b53-71ed-424c-a10e-f14879d37f0b';//amzn1.ask.skill.7e868583-eaf8-4be0-afdb-251b4858e4cf';
 
-exports.handler = function (event, context, callback) {
+exports.handler = dashbot.handler (function (event, context, callback) {
     var alexa = Alexa.handler(event, context);
     alexa.APP_ID = APP_ID;
     alexa.resources = languageStrings;
@@ -119,4 +120,4 @@ var handlers = {
     'SessionEndedRequest': function () {
         this.emit(':tell', this.t('STOP_MESSAGE'));
     }
-};
+});
