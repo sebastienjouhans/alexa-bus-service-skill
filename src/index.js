@@ -17,7 +17,7 @@ exports.handler = dashbot.handler (function (event, context, callback) {
     alexa.resources = languageStrings;
     alexa.registerHandlers(handlers);
     alexa.execute();
-};
+});
 
 var handlers = {
     'LaunchRequest': function () {
@@ -122,4 +122,4 @@ var handlers = {
     'SessionEndedRequest': function () {
         this.emit(':tell', this.t('STOP_MESSAGE'));
     }
-});
+};
