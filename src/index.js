@@ -1,5 +1,7 @@
 'use strict';
 
+require('dotenv').config()
+
 var Alexa = require('alexa-sdk');
 var dashbot = require('dashbot')(process.env.DASHBOT_API_KEY).alexa;
 
